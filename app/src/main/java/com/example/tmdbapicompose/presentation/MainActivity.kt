@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tmdbapicompose.R
 import com.example.tmdbapicompose.domain.models.Result
+import com.example.tmdbapicompose.domain.utils.Logger
 import com.example.tmdbapicompose.domain.utils.NetworkUtil
 import com.example.tmdbapicompose.presentation.navigation.Screen
 import com.example.tmdbapicompose.presentation.ui.customComposables.LottieLoader
@@ -37,11 +38,19 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+/**
+ *  @AndroidEntryPoint require to use dependencies provided by Hilt
+ *  If you annotate an Android class with @AndroidEntryPoint, then you also must annotate Android classes that depend on it.
+ *  For example, if you annotate a fragment, then you must also annotate any activities where you use that fragment.
+ */
+
 @OptIn(ExperimentalAnimationApi::class)
-@AndroidEntryPoint                          //Mandatory for Hilt
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject
-    lateinit var networkUtil: NetworkUtil
+    lateinit var networkUtil: NetworkUtil // Hilt Field Injection
+    @Inject
+    lateinit var logger: Logger // Hilt Field Injection without creating dependency in @Module
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,7 +109,7 @@ class MainActivity : ComponentActivity() {
                             }
                         ) {
                             val vm: HomeScreenViewModel by viewModels()
-                            HomeScreen(navController = navController, viewModel = vm)
+                            HomeScreen(navController = navController, viewModel = vm, logger = logger)
                         }
                         composable(
                             route = Screen.MovieDetails.route,

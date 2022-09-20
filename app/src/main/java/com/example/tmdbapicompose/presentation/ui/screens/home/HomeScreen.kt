@@ -21,6 +21,7 @@ import com.example.tmdbapicompose.R
 import com.example.tmdbapicompose.data.Resource
 import com.example.tmdbapicompose.domain.models.MovieResponse
 import com.example.tmdbapicompose.domain.models.Result
+import com.example.tmdbapicompose.domain.utils.Logger
 import com.example.tmdbapicompose.domain.utils.superNavigate
 import com.example.tmdbapicompose.presentation.navigation.Screen
 import com.example.tmdbapicompose.presentation.ui.customComposables.CenterCircularProgressBar
@@ -29,10 +30,9 @@ import com.example.tmdbapicompose.presentation.ui.customComposables.LottieLoader
 val url = "https://image.tmdb.org/t/p/w342"
 
 @Composable
-fun HomeScreen(navController: NavHostController,viewModel: HomeScreenViewModel) {
+fun HomeScreen(navController: NavHostController,viewModel: HomeScreenViewModel,logger:Logger) {
     val showProgressBarState = remember { mutableStateOf(false) }
     val movies: State<MutableList<Result>> = remember { mutableStateOf(mutableListOf())}
-
     if (showProgressBarState.value) LottieLoader(R.raw.loading)
     else LoadMainContent(movies,navController)
 
@@ -41,6 +41,7 @@ fun HomeScreen(navController: NavHostController,viewModel: HomeScreenViewModel) 
             is Resource.Success->{
                 showProgressBarState.value = false
                 movies.value.addAll(it.value.results)
+                logger.i("response added in list")
             }
             is Resource.Loading ->{
                 showProgressBarState.value = true

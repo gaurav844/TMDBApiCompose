@@ -10,6 +10,9 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+/**
+ * Class to construct the DataSource i.e Retrofit Instance in current case
+ */
 
 class RemoteDataSource @Inject constructor(){
 

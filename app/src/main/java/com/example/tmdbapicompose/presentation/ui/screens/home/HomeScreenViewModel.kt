@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.tmdbapicompose.data.Resource
 import com.example.tmdbapicompose.data.repository.HomeScreenRepository
 import com.example.tmdbapicompose.domain.models.MovieResponse
+import com.example.tmdbapicompose.domain.utils.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,14 +16,19 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-@HiltViewModel      //Mandatory for Hilt
-class HomeScreenViewModel @Inject constructor(private val repository : HomeScreenRepository) : ViewModel() {
+@HiltViewModel      //Mandatory for Hilt to Inject ViewModel
+class HomeScreenViewModel
+@Inject constructor( // Hilt constructor injection
+    private val repository : HomeScreenRepository, // injecting HomeScreenRepository provided by AppModule
+    private val logger:Logger // Injecting Independent Logger.class
+    ) //Constructor Injection
+    : ViewModel() {
 
     private val _movieRes = MutableStateFlow<Resource<MovieResponse>>(Resource.Initial)
     var movieRes: StateFlow<Resource<MovieResponse>> = _movieRes.asStateFlow()
 
     fun fetchAllData(page: Int) {
-        Log.d("LogTag", "Test")
+        logger.i("Test............")
         viewModelScope.launch {
             try {
                 val res1 = async { repository.getMovieList(page) }
