@@ -87,7 +87,7 @@ class MainActivity : ComponentActivity() {
                                                       durationMillis = 300,
                                                       easing = FastOutSlowInEasing
                                                   )
-                                              ) + fadeIn(animationSpec = tween(350))
+                                              ) + fadeIn(animationSpec = tween(300))
                             },
                             exitTransition = {     //Animation for home screen while navigating to detail screen
                                 slideOutHorizontally(
@@ -105,7 +105,7 @@ class MainActivity : ComponentActivity() {
                                         durationMillis = 300,
                                         easing = FastOutSlowInEasing
                                     )
-                                ) + fadeIn(animationSpec = tween(350))
+                                ) + fadeIn(animationSpec = tween(300))
                             }
                         ) {
                             val vm: HomeScreenViewModel by viewModels()
@@ -120,7 +120,7 @@ class MainActivity : ComponentActivity() {
                                         durationMillis = 300,
                                         easing = FastOutSlowInEasing
                                     )
-                                ) + fadeIn(animationSpec = tween(350))
+                                ) + fadeIn(animationSpec = tween(300))
                             },
                             popExitTransition = {   //Animation for detail screen while pop navigating back to home screen
                                 slideOutHorizontally(

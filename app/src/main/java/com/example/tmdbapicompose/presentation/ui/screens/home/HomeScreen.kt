@@ -7,7 +7,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,64 +34,62 @@ val url = "https://image.tmdb.org/t/p/w342"
 
 @Composable
 fun HomeScreen(navController: NavHostController,viewModel: HomeScreenViewModel,logger:Logger) {
-    val showProgressBarState = remember { mutableStateOf(false) }
-    val movies: State<MutableList<Result>> = remember { mutableStateOf(mutableListOf())}
-    if (showProgressBarState.value) LottieLoader(R.raw.loading)
-    else LoadMainContent(movies,navController)
+    val movieState = viewModel.movieRes.collectAsState()
 
-    setupObservable(viewModel){
-        when (it){
-            is Resource.Success->{
-                showProgressBarState.value = false
-                movies.value.addAll(it.value.results)
-                logger.i("response added in list")
-            }
-            is Resource.Loading ->{
-                showProgressBarState.value = true
-            }
-            is Resource.Failure ->{
-                showProgressBarState.value = false
-            }
-            else -> {
-                showProgressBarState.value = false
-            }
-        }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+        LoadMainContent(
+            movieState = movieState.value,
+            navController = navController,
+            logger = logger
+        )
     }
 }
 
 
 
 @Composable
-fun LoadMainContent(movies: State<MutableList<Result>>, navController: NavHostController) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(125.dp),
-            content = {
-                itemsIndexed(movies.value){index, item ->
-                    Box(
-                        modifier = Modifier
-                            .padding(5.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color.Gray),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ItemView(item){
-                            navController.apply {
-                                currentBackStackEntry?.savedStateHandle?.set(
-                                    key = "result",
-                                    value = item
-                                )
+fun LoadMainContent(movieState: Resource<MovieResponse>, navController: NavHostController, logger: Logger) {
+    when (movieState){
+        is Resource.Success->{
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(125.dp),
+                content = {
+                    itemsIndexed(movieState.value.results){index, item ->
+                        Box(
+                            modifier = Modifier
+                                .padding(5.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color.Gray),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ItemView(item){
+                                navController.apply {
+                                    currentBackStackEntry?.savedStateHandle?.set(
+                                        key = "result",
+                                        value = item
+                                    )
 
-                                superNavigate(Screen.MovieDetails.route)
+                                    superNavigate(Screen.MovieDetails.route)
+                                }
+
+                                //navController.navigate("details/$title/$release_date$poster_path/$original_language/${vote_average.toString()}/$overview")
                             }
-
-                            //navController.navigate("details/$title/$release_date$poster_path/$original_language/${vote_average.toString()}/$overview")
                         }
                     }
                 }
-            }
-        )
+            )
+        }
+        is Resource.Loading ->{
+            LottieLoader(R.raw.loading)
+        }
+        is Resource.Failure ->{
+
+        }
+        else -> {
+
+        }
     }
+
 }
 
 @Composable
@@ -99,7 +100,7 @@ fun ItemView(result: Result,onItemClicked: () -> Unit) {
             .shadow(2.dp, RoundedCornerShape(8.dp))
             .background(Color.Gray)
             .fillMaxSize()
-            .clickable {onItemClicked() }
+            .clickable { onItemClicked() }
     ) {
         val showProgressBarState = remember { mutableStateOf(false) }
         if (showProgressBarState.value) { CenterCircularProgressBar() }
@@ -116,20 +117,5 @@ fun ItemView(result: Result,onItemClicked: () -> Unit) {
             contentScale = ContentScale.FillBounds,
             modifier = Modifier.fillMaxSize()
         )
-    }
-}
-
-
-
-@Composable
-fun setupObservable(
-    viewModel: HomeScreenViewModel,
-    onResponse:(res:Resource<MovieResponse>) -> Unit
-) {
-    LaunchedEffect(Unit) {
-        viewModel.fetchAllData(1)
-        viewModel.movieRes.collect{
-            onResponse(it)
-        }
     }
 }

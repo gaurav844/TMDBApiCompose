@@ -1,6 +1,5 @@
 package com.example.tmdbapicompose.presentation.ui.screens.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tmdbapicompose.data.Resource
@@ -12,6 +11,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,22 +27,25 @@ class HomeScreenViewModel
     private val _movieRes = MutableStateFlow<Resource<MovieResponse>>(Resource.Initial)
     var movieRes: StateFlow<Resource<MovieResponse>> = _movieRes.asStateFlow()
 
+    init {
+        fetchAllData(1)
+    }
+
     fun fetchAllData(page: Int) {
         logger.i("Test............")
         viewModelScope.launch {
             try {
+                _movieRes.update { Resource.Loading }
+
                 val res1 = async { repository.getMovieList(page) }
 //                val res2 = async { repository.getMovieList(page) }
 
-                _movieRes.value = Resource.Loading
-
                 val resultFromApi1 = res1.await()
 //                val resultFromApi2 = res2.await()
-
-                _movieRes.value = resultFromApi1
+                _movieRes.update { resultFromApi1 }
 //                _movieRes2.value = resultFromApi2
-            } catch (e: Exception) {
-                Log.d("LogException", e.toString())
+            } catch (exception: Exception) {
+                logger.e("LogException", exception)
             }
         }
     }
