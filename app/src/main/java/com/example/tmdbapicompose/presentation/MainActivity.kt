@@ -3,7 +3,6 @@ package com.example.tmdbapicompose.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.animation.*
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -29,7 +28,6 @@ import com.example.tmdbapicompose.presentation.navigation.Screen
 import com.example.tmdbapicompose.presentation.ui.customComposables.LottieLoader
 import com.example.tmdbapicompose.presentation.ui.screens.AnimatedSplashScreen
 import com.example.tmdbapicompose.presentation.ui.screens.home.HomeScreen
-import com.example.tmdbapicompose.presentation.ui.screens.home.HomeScreenViewModel
 import com.example.tmdbapicompose.presentation.ui.screens.movieDetail.MovieDetailScreen
 import com.example.tmdbapicompose.presentation.ui.theme.TMDBApiComposeTheme
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -108,8 +106,7 @@ class MainActivity : ComponentActivity() {
                                 ) + fadeIn(animationSpec = tween(300))
                             }
                         ) {
-                            val vm: HomeScreenViewModel by viewModels()
-                            HomeScreen(navController = navController, viewModel = vm, logger = logger)
+                            HomeScreen(navController = navController, logger = logger)
                         }
                         composable(
                             route = Screen.MovieDetails.route,
